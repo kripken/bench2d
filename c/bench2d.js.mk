@@ -2,7 +2,7 @@
 
 # You'll likely need to edit these for your particular directory layout.
 EMSCRIPTEN=~/Dev/emscripten/emscripten.py
-LLVM_LINK=~/Dev/llvm-emscripten/cbuild/bin/llvm-link
+LLVM=~/Dev/llvm-emscripten/cbuild/bin
 EMCC=~/Dev/emscripten/emcc -IBox2D_v2.2.1
 
 OBJECTS = bench2d_main.bc \
@@ -53,17 +53,25 @@ Box2D_v2.2.1/Box2D/Dynamics/Joints/b2WeldJoint.bc \
 Box2D_v2.2.1/Box2D/Dynamics/Joints/b2WheelJoint.bc \
 Box2D_v2.2.1/Box2D/Rope/b2Rope.bc
 
-all: bench2d.opt.js
+all: bench2d.opt.js bench2d_native
 
 %.bc: %.cpp
 	python $(EMCC) $< -o $@
 
 bench2d.bc: $(OBJECTS)
-	$(LLVM_LINK) -o $@ $(OBJECTS)
+	$(LLVM)/llvm-link -o $@ $(OBJECTS)
 
 bench2d.opt.js: bench2d.bc
-	$(EMCC) -O3 -s TOTAL_MEMORY=150000000 $< -o $@
+	$(EMCC) -O2 -s TOTAL_MEMORY=150000000 $< -o $@
+
+bench2d.opt.bc: bench2d.bc
+	$(LLVM)/opt -O3 $< -o=$@
+
+bench2d_native: bench2d.opt.bc
+	$(LLVM)/llc $< -o=bench2d_native.s
+	grep -v __assert_func bench2d_native.s > bench2d_native_clean.s
+	as bench2d_native_clean.s -o =$@
 
 clean:
-	rm bench2d.opt.js bench2d.bc $(OBJECTS)
+	rm bench2d.opt.js bench2d.bc $(OBJECTS) bench2d.native bench2d_native.s bench2d_native_clean.s bench2d_native_clean.o bench2d.opt.bc 
 

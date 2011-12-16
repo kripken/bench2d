@@ -62,7 +62,7 @@ bench2d.bc: $(OBJECTS)
 	$(LLVM)/llvm-link -o $@ $(OBJECTS)
 
 bench2d.opt.js: bench2d.bc
-	$(EMCC) -O3 -s TOTAL_MEMORY=150000000 $< -o $@
+	$(EMCC) -O3 -s USE_TYPED_ARRAYS=1 -s QUANTUM_SIZE=1 -s TOTAL_MEMORY=150000000 $< -o $@
 
 bench2d.opt.bc: bench2d.bc
 	$(LLVM)/opt -O3 $< -o=$@

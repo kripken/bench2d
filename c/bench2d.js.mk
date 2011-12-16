@@ -2,7 +2,7 @@
 
 # You'll likely need to edit these for your particular directory layout.
 EMSCRIPTEN=~/Dev/emscripten/emscripten.py
-LLVM_LINK=~/Dev/llvm-30-rc3/cbuild/bin/llvm-link
+LLVM_LINK=~/Dev/llvm-emscripten/cbuild/bin/llvm-link
 EMCC=~/Dev/emscripten/emcc -IBox2D_v2.2.1
 
 OBJECTS = bench2d_main.bc \

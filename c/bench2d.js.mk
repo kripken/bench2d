@@ -70,7 +70,7 @@ bench2d.opt.bc: bench2d.bc
 bench2d_native: bench2d.opt.bc
 	$(LLVM)/llc $< -o=bench2d_native.s
 	grep -v __assert_func bench2d_native.s > bench2d_native_clean.s
-	as bench2d_native_clean.s -o =$@
+	as bench2d_native_clean.s -o $@
 
 clean:
 	rm bench2d.opt.js bench2d.bc $(OBJECTS) bench2d.native bench2d_native.s bench2d_native_clean.s bench2d_native_clean.o bench2d.opt.bc 

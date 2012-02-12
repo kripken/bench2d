@@ -1,5 +1,5 @@
-CC = gcc
-CFLAGS=-s -O3 -msse -mfpmath=sse -ffast-math -fomit-frame-pointer -IBox2D_v2.2.1 -DNDEBUG=1
+CC = ~/Dev/llvm-emscripten/cbuild/bin/clang
+CFLAGS = -O3 -IBox2D_v2.2.1
 LFLAGS = -lstdc++
 
 OBJECTS = bench2d_main.o \

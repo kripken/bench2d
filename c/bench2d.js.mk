@@ -1,7 +1,6 @@
 # Makefile for generating Javascript from the C++ source, using Emscripten.
 
 # You'll likely need to edit these for your particular directory layout.
-EMSCRIPTEN=~/Dev/emscripten/emscripten.py
 LLVM=~/Dev/llvm-emscripten/cbuild/bin
 EMCC=~/Dev/emscripten/emcc -IBox2D_v2.2.1
 
@@ -53,7 +52,7 @@ Box2D_v2.2.1/Box2D/Dynamics/Joints/b2WeldJoint.bc \
 Box2D_v2.2.1/Box2D/Dynamics/Joints/b2WheelJoint.bc \
 Box2D_v2.2.1/Box2D/Rope/b2Rope.bc
 
-all: bench2d.opt.js bench2d_native
+all: bench2d.opt.js bench2d.inline.js bench2d_native
 
 %.bc: %.cpp
 	python $(EMCC) $< -o $@
@@ -62,7 +61,10 @@ bench2d.bc: $(OBJECTS)
 	$(LLVM)/llvm-link -o $@ $(OBJECTS)
 
 bench2d.opt.js: bench2d.bc
-	$(EMCC) -O3 -s USE_TYPED_ARRAYS=1 -s QUANTUM_SIZE=1 $< -o $@
+	$(EMCC) -O3 --compress 0 $< -o $@
+
+bench2d.inline.js: bench2d.bc
+	$(EMCC) -O3 --compress 0 -s INLINING_LIMIT=0 $< -o $@
 
 bench2d.opt.bc: bench2d.bc
 	$(LLVM)/opt -O3 $< -o=$@

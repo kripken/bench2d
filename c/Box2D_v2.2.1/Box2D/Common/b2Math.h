@@ -21,7 +21,7 @@
 
 #include <Box2D/Common/b2Settings.h>
 
-#ifndef EM_NO_LIBCPP
+#ifdef EM_NO_LIBCPP
 #include <math.h>
 #include <float.h>
 #include <stddef.h>

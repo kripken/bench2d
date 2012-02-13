@@ -19,7 +19,7 @@
 #ifndef B2_SETTINGS_H
 #define B2_SETTINGS_H
 
-#ifndef EM_NO_LIBCPP
+#ifdef EM_NO_LIBCPP
 #include <assert.h>
 #include <math.h>
 #else

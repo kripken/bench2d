@@ -22,7 +22,7 @@
 #include <Box2D/Common/b2Settings.h>
 #include <Box2D/Collision/b2Collision.h>
 #include <Box2D/Collision/b2DynamicTree.h>
-#include <algorithm>
+//#include <algorithm>
 
 struct b2Pair
 {

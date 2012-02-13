@@ -21,7 +21,9 @@
 
 #include <Box2D/Common/b2Math.h>
 #include <Box2D/Collision/Shapes/b2Shape.h>
-//#include <memory>
+#ifndef EM_NO_LIBCPP
+#include <memory>
+#endif
 
 class b2Fixture;
 class b2Joint;

@@ -52,27 +52,28 @@ Box2D_v2.2.1/Box2D/Dynamics/Joints/b2WeldJoint.bc \
 Box2D_v2.2.1/Box2D/Dynamics/Joints/b2WheelJoint.bc \
 Box2D_v2.2.1/Box2D/Rope/b2Rope.bc
 
-all: box2d_bindings.cpp
+all: box2d.js
+
 # box2d.js
 
 %.bc: %.cpp
 	$(EMCC) -IBox2D_v2.2.1 $< -o $@
 
 box2d.clean.h:
-	cpp -x c++ -IBox2D_v2.2.1 root.h > box2d.clean.h
+	cpp -x c++ -DEM_NO_LIBCPP -IBox2D_v2.2.1 root.h > box2d.clean.h
 
 box2d_bindings.cpp: box2d.clean.h
 	python $(EMSCRIPTEN)/tools/bindings_generator.py box2d_bindings box2d.clean.h
 
 box2d_bindings.bc: box2d_bindings.cpp
-	$(EMCC) -IBox2D_v2.2.1 $< -o $@
+	$(EMCC) -IBox2D_v2.2.1 -include root.h $< -o $@
 
 box2d.bc: $(OBJECTS) box2d_bindings.bc
 	$(LLVM)/llvm-link -o $@ $(OBJECTS) box2d_bindings.bc
 
 box2d.js: box2d.bc
-	$(EMCC) -O3 -s INLINING_LIMIT=0 --compress 0 $< -o $@
+	$(EMCC) -O2 -s INLINING_LIMIT=0 --compress 0 --js-transform "python bundle.py" $< -o $@
 
 clean:
-	rm box2d.js box2d.bc $(OBJECTS)
+	rm box2d.js box2d.bc $(OBJECTS) box2d_bindings.cpp box2d_bindings.bc box2d.clean.h
 

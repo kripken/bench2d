@@ -21,10 +21,17 @@
 
 #include <Box2D/Common/b2Settings.h>
 
+#ifndef EM_NO_LIBCPP
 #include <math.h>
 #include <float.h>
 #include <stddef.h>
 #include <limits.h>
+#else
+#include <cmath>
+#include <cfloat>
+#include <cstddef>
+#include <climits>
+#endif
 
 /// This function is used to ensure that a floating point number is
 /// not a NaN or infinity.

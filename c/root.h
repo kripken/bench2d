@@ -1,5 +1,7 @@
 // Prevent some inclusions
 #define NDEBUG
+
+#ifdef EM_NO_LIBCPP
 #define _FEATURES_H
 #define _GLIBCXX_CMATH
 #define _GLIBCXX_CXX_CONFIG_H
@@ -13,6 +15,7 @@
 #define _EXT_NUMERIC_TRAITS
 #define _STL_ITERATOR_BASE_TYPES_H
 #define _STL_ITERATOR_H
+#endif
 
 #include <Box2D/Box2D.h>
 

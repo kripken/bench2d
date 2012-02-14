@@ -30,7 +30,7 @@
 #include <cmath>
 #include <cfloat>
 #include <cstddef>
-#include <climits>
+#include <limits>
 #endif
 
 /// This function is used to ensure that a floating point number is

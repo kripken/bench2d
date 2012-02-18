@@ -1,6 +1,10 @@
 // js -m -n -e "load('box2d.js')" test.js
 
-var DEBUG = 0;
+function clock() {
+  return Date.now();
+}
+
+var DEBUG = 1;
 
 var WARMUP = 64;
 var FRAMES = 256;
@@ -21,7 +25,7 @@ function bench() {
   shape.Set(new Box2D.b2Vec2(-40.0, 0.0), new Box2D.b2Vec2(40.0, 0.0));
   ground.CreateFixture(shape, 0.0);
 
-  var topBody = new Box2D.b2Body();
+  var topBody;
 
   var a = 0.5;
   var shape = new Box2D.b2PolygonShape();
@@ -61,7 +65,7 @@ function bench() {
     var end = clock();
     times[i] = end - start;
     if (DEBUG) print(topBody.GetPosition().get_y());
-    print((end - start) / (1000 * 1000));
+    print(end - start);
   }
 
   print('');
@@ -70,7 +74,7 @@ function bench() {
   for (var i = 0; i < FRAMES; ++i) {
     total += times[i];
   }
-  printf(total / (FRAMES * (CLOCKS_PER_SEC * 1000)));
+  print(total/FRAMES);
 }
 
 bench();

@@ -21,9 +21,9 @@ function bench() {
   var bd = new Box2D.b2BodyDef();
   var ground = world.CreateBody(bd);
 
-  var shape = new Box2D.b2EdgeShape();
-  shape.Set(new Box2D.b2Vec2(-40.0, 0.0), new Box2D.b2Vec2(40.0, 0.0));
-  ground.CreateFixture(shape, 0.0);
+  var shape0 = new Box2D.b2EdgeShape();
+  shape0.Set(new Box2D.b2Vec2(-40.0, 0.0), new Box2D.b2Vec2(40.0, 0.0));
+  ground.CreateFixture(shape0, 0.0);
 
   var topBody;
 
@@ -43,7 +43,7 @@ print('zz x: ' + [x.get_x(), x.get_y()]);
 
     for (var j = i; j < e_count; ++j) {
       var bd = new Box2D.b2BodyDef();
-      bd.set_type(Box2D.b2_dynamicBody);
+      bd.set_type(2); // b2_dynamicBody);
       bd.set_position(y);
       var body = world.CreateBody(bd);
       body.CreateFixture(shape, 5.0);
@@ -66,7 +66,7 @@ print('zz x: ' + [x.get_x(), x.get_y()]);
     world.Step(1.0/60.0, 3, 3);
     var end = clock();
     times[i] = end - start;
-    if (DEBUG) print(topBody.GetPosition().get_y());
+    if (DEBUG) print([topBody.GetPosition().get_y(), topBody.GetMass()]);
     print(end - start);
   }
 

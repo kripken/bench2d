@@ -32,7 +32,6 @@ function bench() {
   shape.SetAsBox(a, a);
 
   var x = new Box2D.b2Vec2(-7.0, 0.75);
-print('zz x: ' + [x.get_x(), x.get_y()]);
   var y = new Box2D.b2Vec2();
   var deltaX = new Box2D.b2Vec2(0.5625, 1);
   var deltaY = new Box2D.b2Vec2(1.125, 0.0);

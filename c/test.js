@@ -32,12 +32,14 @@ function bench() {
   shape.SetAsBox(a, a);
 
   var x = new Box2D.b2Vec2(-7.0, 0.75);
+print('zz x: ' + [x.get_x(), x.get_y()]);
   var y = new Box2D.b2Vec2();
   var deltaX = new Box2D.b2Vec2(0.5625, 1);
   var deltaY = new Box2D.b2Vec2(1.125, 0.0);
 
   for (var i = 0; i < e_count; ++i) {
-    y = x;
+    y.set_x(x.get_x());
+    y.set_y(x.get_y());
 
     for (var j = i; j < e_count; ++j) {
       var bd = new Box2D.b2BodyDef();
@@ -48,10 +50,10 @@ function bench() {
 
       topBody = body;
 
-      y += deltaY;
+      y.op_add(deltaY);
     }
 
-    x += deltaX;
+    x.op_add(deltaX);
   }
 
   for (var i = 0; i < WARMUP; ++i) {

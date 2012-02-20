@@ -1,96 +1,76 @@
 <html>
     <head>
-      <title>Bullet/WebGL Demo</title>
+      <title>Box2D/WebGL Demo</title>
       <script src="CubicVR.min.js" type="text/javascript"></script>
-      <script src="../../builds/ammo.js" type="text/javascript"></script>
+      <script src="../box2d.js" type="text/javascript"></script>
       <style type="text/css">
         body { background-color: #ccc; }
       </style>
 
       <script type="text/javascript">
-        var NUM = 20;
+        var NUM = 2;
         var NUMRANGE = [];
         while (NUMRANGE.length < NUM) NUMRANGE.push(NUMRANGE.length+1);
+        var bodies = [null]; // Indexes start from 1
 
-        // Bullet-interfacing code
+        // Box2D-interfacing code
 
-        var collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
-        var dispatcher = new Ammo.btCollisionDispatcher(collisionConfiguration);
-        var overlappingPairCache = new Ammo.btDbvtBroadphase();
-        var solver = new Ammo.btSequentialImpulseConstraintSolver();
-        var dynamicsWorld = new Ammo.btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
-        dynamicsWorld.setGravity(new Ammo.btVector3(0, -10, 0));
+        var gravity = new Box2D.b2Vec2(0.0, -10.0);
 
-        var groundShape = new Ammo.btBoxShape(new Ammo.btVector3(50, 50, 50));
+        var world = new Box2D.b2World(gravity);
+        world.SetAllowSleeping(false);
 
-        var bodies = [];
+        var bd_ground = new Box2D.b2BodyDef();
+        var ground = world.CreateBody(bd_ground);
 
-        var groundTransform = new Ammo.btTransform();
-        groundTransform.setIdentity();
-        groundTransform.setOrigin(new Ammo.btVector3(0, -56, 0));
+        var shape0 = new Box2D.b2EdgeShape();
+        shape0.Set(new Box2D.b2Vec2(-40.0, -56.0), new Box2D.b2Vec2(40.0, -56.0));
+        ground.CreateFixture(shape0, 0.0);
 
-        (function() {
-          var mass = 0;
-          var localInertia = new Ammo.btVector3(0, 0, 0);
-          var myMotionState = new Ammo.btDefaultMotionState(groundTransform);
-          var rbInfo = new Ammo.btRigidBodyConstructionInfo(0, myMotionState, groundShape, localInertia);
-          var body = new Ammo.btRigidBody(rbInfo);
-
-          dynamicsWorld.addRigidBody(body);
-          bodies.push(body);
-        })();
-
-        var boxShape = new Ammo.btBoxShape(new Ammo.btVector3(1, 1, 1));
+        var size = 1.0; // XXX 1?
+        var shape = new Box2D.b2PolygonShape();
+        shape.SetAsBox(size, size);
 
         NUMRANGE.forEach(function(i) {
-          var startTransform = new Ammo.btTransform();
-          startTransform.setIdentity();
-          var mass = 1;
-          var localInertia = new Ammo.btVector3(0, 0, 0);
-          boxShape.calculateLocalInertia(mass, localInertia);
-        
-          var myMotionState = new Ammo.btDefaultMotionState(startTransform);
-          var rbInfo = new Ammo.btRigidBodyConstructionInfo(mass, myMotionState, boxShape, localInertia);
-          var body = new Ammo.btRigidBody(rbInfo);
+          var bd = new Box2D.b2BodyDef();
+          bd.set_type(Box2D.b2_dynamicBody);
+          bd.set_position(new Box2D.b2Vec2(0.0, 4.0 + 2.5*i));
+          var body = world.CreateBody(bd);
+          body.CreateFixture(shape, 5.0);
 
-          dynamicsWorld.addRigidBody(body);
           bodies.push(body);
         });
 
         function resetPositions() {
           NUMRANGE.forEach(function(i) {
             var body = bodies[i];
-            var origin = body.getWorldTransform().getOrigin();
-            origin.setX((Math.random()-0.5)*2);
-            origin.setY(4+i*2.5);
-            origin.setZ((Math.random()-0.5)*1);
-            body.activate();
+            body.SetTransform(new Box2D.b2Vec2(0.0, 4.0 + 2.5*i), 0.0);
+            body.SetAwake(1); // SetActive XXX?
           });
         }
 
         resetPositions();
 
-        var transform = new Ammo.btTransform(); // taking this out of readBulletObject reduces the leaking
-        function readBulletObject(i, pos, quat) {
+        function readObject(i, pos, quat) {
           var body = bodies[i];
-          body.getMotionState().getWorldTransform(transform);
-          var origin = transform.getOrigin();
-          pos[0] = origin.x();
-          pos[1] = origin.y();
-          pos[2] = origin.z();
-          var rotation = transform.getRotation();
-          quat.x = rotation.x();
-          quat.y = rotation.y();
-          quat.z = rotation.z();
-          quat.w = rotation.w();
+          var bpos = body.GetPosition();
+          pos[0] = bpos.get_x();
+          pos[1] = bpos.get_y();
+          pos[2] = 0;
+          var angle = body.GetAngle();
+          quat.x = Math.cos(angle);
+          quat.y = Math.sin(angle);
+          quat.z = 0;
+          quat.w = 1;
         }
 
         var lastInactivity = Date.now();
         function noneActive() {
+          return false;
           var num = 0;
           NUMRANGE.forEach(function(i) {
             var body = bodies[i];
-            num += body.isActive();
+            num += body.IsAwake(); // SetActive XXX?
           });
           if ((Date.now() - lastInactivity) >= 1000*num) { // consider none active also if enough time passed
             lastInactivity = Date.now();
@@ -107,11 +87,11 @@
         var quaternion = new CubicVR.Quaternion;
 
         function simulate(dt) {
-          dynamicsWorld.stepSimulation(dt, 2);
+          world.Step(1.0/60.0, 3, 3);
 
-          // Read bullet data into JS objects
+          // Read box2d data into JS objects
           for (var i = 0; i < NUM; i++) {
-            readBulletObject(i+1, position, quaternion);
+            readObject(i+1, position, quaternion);
             var renderObject = boxes[i];
             renderObject.position[0] = position[0];
             renderObject.position[1] = position[1];
@@ -220,7 +200,7 @@
           var floor_ = new CubicVR.SceneObject({ mesh: floorMesh, position: [0, FLOOR_HEIGHT, 0] });
           scene.bindSceneObject(floor_, true);
 
-          var mvc = new CubicVR.MouseViewController(canvas, scene.camera);
+          var mvc = new CubicVR.MouseViewController(canvas, scene.camera); // XXX
 
           CubicVR.MainLoop(function(timer, gl) {
             var dt = timer.getLastUpdateSeconds();
@@ -241,11 +221,9 @@
         <div id="out">waka</div>
         <p>
         This is <b><a href="https://github.com/kripken/ammo.js">ammo.js</a></b>, a port of
-        the <b><a href="http://www.bulletphysics.com">Bullet physics engine</a></b> from C++ to JavaScript
+        the <b><a href="http://box2d.org/">Box2D physics engine</a></b> from C++ to JavaScript
         using <b><a href="http://emscripten.org">Emscripten</a></b>. WebGL rendering in this demo is done using
         <b><a href="https://github.com/cjcliffe/CubicVR.js/">CubicVR.js</a></b>.
-        </p><p>
-        Adjust the view by dragging the mouse over the canvas.
         </p>
       </center>
     </body>

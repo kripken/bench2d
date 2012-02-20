@@ -14,7 +14,6 @@ var e_count = 40;
 function bench() {
   var gravity = new Box2D.b2Vec2(0.0, -10.0);
 
-  // Construct a world object, which will hold and simulate the rigid bodies.
   var world = new Box2D.b2World(gravity);
   world.SetAllowSleeping(false);
 
@@ -42,7 +41,7 @@ function bench() {
 
     for (var j = i; j < e_count; ++j) {
       var bd = new Box2D.b2BodyDef();
-      bd.set_type(2); // b2_dynamicBody);
+      bd.set_type(Box2D.b2_dynamicBody);
       bd.set_position(y);
       var body = world.CreateBody(bd);
       body.CreateFixture(shape, 5.0);

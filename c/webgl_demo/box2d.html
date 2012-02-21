@@ -18,7 +18,6 @@
         var gravity = new Box2D.b2Vec2(0.0, -10.0);
 
         var world = new Box2D.b2World(gravity);
-        world.SetAllowSleeping(false);
 
         var bd_ground = new Box2D.b2BodyDef();
         var ground = world.CreateBody(bd_ground);
@@ -27,7 +26,7 @@
         shape0.Set(new Box2D.b2Vec2(-40.0, -6.0), new Box2D.b2Vec2(40.0, -6.0));
         ground.CreateFixture(shape0, 0.0);
 
-        var size = 1.0; // XXX 1?
+        var size = 1.0;
         var shape = new Box2D.b2PolygonShape();
         shape.SetAsBox(size, size);
 
@@ -52,17 +51,12 @@
 
         resetPositions();
 
-        function readObject(i, pos, quat) {
+        function readObject(i, data) {
           var body = bodies[i];
           var bpos = body.GetPosition();
-          pos[0] = bpos.get_x();
-          pos[1] = bpos.get_y();
-          pos[2] = 0;
-          var angle = body.GetAngle();
-          quat.x = Math.cos(angle);
-          quat.y = Math.sin(angle);
-          quat.z = 0;
-          quat.w = 1;
+          data.x = bpos.get_x();
+          data.y = bpos.get_y();
+          data.angle = body.GetAngle();
         }
 
         var lastInactivity = Date.now();
@@ -70,9 +64,9 @@
           var num = 0;
           NUMRANGE.forEach(function(i) {
             var body = bodies[i];
-            num += body.IsActive();
+            num += body.IsAwake();
           });
-          if ((Date.now() - lastInactivity) >= 1000*num) { // consider none active also if enough time passed
+          if ((Date.now() - lastInactivity) >= 3000*num) { // consider none active also if enough time passed
             lastInactivity = Date.now();
             return true;
           }
@@ -84,19 +78,20 @@
         var boxes = [];
 
         var position = [0,0,0];
-        var quaternion = new CubicVR.Quaternion;
 
         function simulate(dt) {
           world.Step(1.0/60.0, 3, 3);
 
+          var data = { x: 0, y: 0, angle: 0 };
+
           // Read box2d data into JS objects
           for (var i = 0; i < NUM; i++) {
-            readObject(i+1, position, quaternion);
+            readObject(i+1, data);
             var renderObject = boxes[i];
-            renderObject.position[0] = position[0];
-            renderObject.position[1] = position[1];
-            renderObject.position[2] = position[2];
-            renderObject.rotation = quaternion.toEuler();
+            renderObject.position[0] = data.x;
+            renderObject.position[1] = data.y;
+            renderObject.position[2] = 0;
+            renderObject.rotation = [0, 0, data.angle*180/Math.PI];
           }
 
           if (noneActive()) restart();
@@ -200,7 +195,7 @@
           var floor_ = new CubicVR.SceneObject({ mesh: floorMesh, position: [0, FLOOR_HEIGHT, 0] });
           scene.bindSceneObject(floor_, true);
 
-          var mvc = new CubicVR.MouseViewController(canvas, scene.camera); // XXX
+          //var mvc = new CubicVR.MouseViewController(canvas, scene.camera);
 
           CubicVR.MainLoop(function(timer, gl) {
             var dt = timer.getLastUpdateSeconds();

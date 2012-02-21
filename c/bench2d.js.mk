@@ -61,7 +61,7 @@ bench2d.bc: $(OBJECTS)
 	$(LLVM)/llvm-link -o $@ $(OBJECTS)
 
 bench2d.js: bench2d.bc
-	$(EMCC) -O3 -s INLINING_LIMIT=0 $< -o $@
+	$(EMCC) -O2 -s INLINING_LIMIT=0 $< -o $@
 
 clean:
 	rm bench2d.js bench2d.bc $(OBJECTS)

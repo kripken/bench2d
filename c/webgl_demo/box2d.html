@@ -8,7 +8,7 @@
       </style>
 
       <script type="text/javascript">
-        var NUM = 5;
+        var NUM = 15;
         var NUMRANGE = [];
         while (NUMRANGE.length < NUM) NUMRANGE.push(NUMRANGE.length+1);
         var bodies = [null]; // Indexes start from 1
@@ -43,7 +43,8 @@
         function resetPositions() {
           NUMRANGE.forEach(function(i) {
             var body = bodies[i];
-            body.SetTransform(new Box2D.b2Vec2(2*(Math.random()-0.5), 4.0 + 2.5*i), 0.0);
+            body.SetTransform(new Box2D.b2Vec2(3*(Math.random()-0.5), 4.0 + 2.5*i), 0.0);
+            body.SetLinearVelocity(new Box2D.b2Vec2(0.0, 0.0, 0.0));
             body.SetAwake(1);
             body.SetActive(1);
           });
@@ -80,7 +81,7 @@
         var position = [0,0,0];
 
         function simulate(dt) {
-          world.Step(1.0/60.0, 3, 3);
+          world.Step(dt, 1, 1);
 
           var data = { x: 0, y: 0, angle: 0 };
 

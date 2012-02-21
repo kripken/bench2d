@@ -46,7 +46,7 @@
         function resetPositions() {
           NUMRANGE.forEach(function(i) {
             var body = bodies[i];
-            temp.Set(3*(Math.random()-0.5), 4.0 + 2.5*i);
+            temp.Set(8*(Math.random()-0.5), 4.0 + 2.5*i);
             body.SetTransform(temp, 0.0);
             body.SetLinearVelocity(ZERO);
             body.SetAwake(1);

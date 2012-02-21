@@ -30,10 +30,13 @@
         var shape = new Box2D.b2PolygonShape();
         shape.SetAsBox(size, size);
 
+        var ZERO = new Box2D.b2Vec2(0.0, 0.0);
+        var temp = new Box2D.b2Vec2(0.0, 0.0);
+
         NUMRANGE.forEach(function(i) {
           var bd = new Box2D.b2BodyDef();
           bd.set_type(Box2D.b2_dynamicBody);
-          bd.set_position(new Box2D.b2Vec2(0.0, 0.0));
+          bd.set_position(ZERO);
           var body = world.CreateBody(bd);
           body.CreateFixture(shape, 5.0);
 
@@ -43,8 +46,9 @@
         function resetPositions() {
           NUMRANGE.forEach(function(i) {
             var body = bodies[i];
-            body.SetTransform(new Box2D.b2Vec2(3*(Math.random()-0.5), 4.0 + 2.5*i), 0.0);
-            body.SetLinearVelocity(new Box2D.b2Vec2(0.0, 0.0, 0.0));
+            temp.Set(3*(Math.random()-0.5), 4.0 + 2.5*i);
+            body.SetTransform(temp, 0.0);
+            body.SetLinearVelocity(ZERO);
             body.SetAwake(1);
             body.SetActive(1);
           });
